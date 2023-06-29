@@ -4,19 +4,37 @@ let canvasHeight = 800;
 //rojosNegros
 let miCapa1;
 let imagenActualCapa1; // Variable para almacenar la imagen actual
+let capa1RojasNegras;
+let rojasNegrasPhaseTime = 500; // Tiempo en milisegundos para la fase celeste
+let rojasNegrasPhaseActive = true;
 
 // Amarillas
 let customImages = [];
+let capa2Amarillas;
+let yellowPhaseTime = 5000; // Tiempo en milisegundos para la fase amarilla
+let yellowPhaseActive = false;
 
 //lilas
 let lilas = [];
+let capa3Lilas;
+let lilacPhaseTime = 4000; // Tiempo en milisegundos para la fase lila
+let lilacPhaseActive = false;
 
 //celeste
 let celestes;
+let capa4Celestes;
+let celestePhaseTime = 5000; // Tiempo en milisegundos para la fase celeste
+let celestePhaseActive = false;
 
 //naranjasGrises
 let miCapa5;
 let imagenActual; // Variable para almacenar la imagen actual
+let capa5Naranjas;
+let naranjasGrisesPhaseTime = 500; // Tiempo en milisegundos para la fase celeste
+let naranjasGrisesPhaseActive = false;
+
+// Tiempo actual en milisegundos
+let currentTime = 0;
 
 //-------CONFIGURACION----
 
@@ -46,6 +64,12 @@ const pichModel = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/
 
 function setup() {
   createCanvas(canvasWidth, canvasHeight);
+  
+  //capa1RojasNegras = createGraphics(width, height);
+  capa2Amarillas = createGraphics(width, height);
+  capa3Lilas = createGraphics(width, height);
+  capa4Celestes = createGraphics(width, height);
+  //capa5Naranjas = createGraphics(width, height);
 
   //rojosNegros
   // Inicializar una instancia de la clase Imagenes
@@ -90,42 +114,89 @@ function setup() {
   mic.start(startPitch);
 
   userStartAudio(); // esto lo utilizo porque en algunos navigadores se cuelga el audio. Esto hace un reset del motor de audio (audio context)
-
+background(255);
 }
 
 function draw() {
-  background(255);
-
-  imprimirData()
+  
+  //imprimirData()
   amp = mic.getLevel();
   haySonido = amp > AMP_MIN;
   difDeFrecuencia = frecuencia - frecuenciaAnterior;
 
-  //rojosNegros
-  // Mostrar la imagen actual en el lienzo
+  currentTime += deltaTime;
+// Mostrar la capa 1 de rojas negras
+if (rojasNegrasPhaseActive) {
   image(imagenActualCapa1, 0, 0, 800, 800);
+  if (currentTime >= rojasNegrasPhaseTime) {
+    rojasNegrasPhaseActive = false;
+    yellowPhaseActive = true;
+    currentTime = 0;
+  }
+}
 
-  // Amarillas
+// Mostrar la capa 2 de amarillas
+if (yellowPhaseActive) {
   for (let i = 0; i < customImages.length; i++) {
-    customImages[i].showImage();
+    customImages[i].showImage(capa2Amarillas);
     customImages[i].updatePosition();
   }
+  if (currentTime >= yellowPhaseTime) {
+    yellowPhaseActive = false;
+    lilacPhaseActive = true;
+    currentTime = 0;
+  }
+}
 
-  //lilas
+// Mostrar la capa 3 de lilas
+if (lilacPhaseActive) {
   for (let l of lilas) {
     l.updateTransparency();
-    l.draw();
+    l.draw(capa3Lilas);
   }
-
-  //celestes 
-celestes.updatePosition();
-celestes.checkDistances();
-celestes.dibujar();
-
-  //naranjasGrises
-  // Mostrar la imagen actual en el lienzo
-  image(imagenActual, 0, 0, 800, 800);
+  if (currentTime >= lilacPhaseTime) {
+    lilacPhaseActive = false;
+    celestePhaseActive = true;
+    currentTime = 0;
+  }
 }
+
+// Mostrar la capa 4 de celestes
+if (celestePhaseActive) {
+  celestes.updatePosition();
+  celestes.checkDistances();
+  celestes.dibujar(capa4Celestes);
+  if (currentTime >= celestePhaseTime) {
+    celestePhaseActive = false;
+    yellowPhaseActive=true;
+    currentTime = 0;
+  }
+}
+
+// Mostrar la capa 5 de naranjas grises
+if (naranjasGrisesPhaseActive) {
+  image(imagenActual, 0, 0, 800, 800);
+  if (currentTime >= naranjasGrisesPhaseTime) {
+    naranjasGrisesPhaseActive = false;
+    yellowPhaseActive=true;
+    currentTime=0;
+  }
+}
+else{
+    image(imagenActualCapa1, 0, 0, 800, 800);
+    for (let i = 0; i < customImages.length; i++) {
+      customImages[i].showImage(capa2Amarillas);
+    }
+    for (let l of lilas) {
+      l.draw(capa3Lilas);
+    }
+    celestes.dibujar(capa4Celestes);
+    image(imagenActual, 0, 0, 800, 800); 
+  }
+}
+ 
+  
+
 
 
 //-------FRECUENCIA-----
@@ -160,4 +231,3 @@ function imprimirData(){
   pop();
 
 }
-
