@@ -17,7 +17,7 @@ let yellowPhaseActive = false;
 //lilas
 let lilas = [];
 let capa3Lilas;
-let lilacPhaseTime = 4000; // Tiempo en milisegundos para la fase lila
+let lilacPhaseTime = 3000; // Tiempo en milisegundos para la fase lila
 let lilacPhaseActive = false;
 
 //celeste
